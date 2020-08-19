@@ -1,0 +1,592 @@
+<!doctype html>
+<html>
+<head>
+  <title>Psychology Experiment</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="jspsych-6.0.1/jspsych.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-html-keyboard-response.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-html-keyboard-response3.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-resize.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-fullscreen.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-image-keyboard-response.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-html-button-response.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-image-button-response.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-instructions.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-external-html.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-survey-text.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-survey-multi-choice.js"></script>
+  <script src="jspsych-6.0.1/plugins/jspsych-call-function.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script src="PapaParse-5.0.2/papaparse.min.js"></script>
+  <link href="jspsych-6.0.1/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+
+</head>
+<body>
+</body>
+
+<script>
+
+//function to check if a subject has given consent to participate.
+function check_consent(elem) {
+    if ($('#consent_checkbox').is(':checked')) {
+      return true;
+    }
+    else {
+      alert("If you wish to participate, you must check the box next to the statement 'I agree to participate in this study.'");
+      return false;
+    }
+    return false;
+};
+
+
+// declare consent form block.
+var consent_form = {
+  type:'external-html',
+  url: "http://chialinkhern.web.illinois.edu/superprime/KaraConsentForm.html",
+    cont_btn: "start",
+    check_fn: check_consent
+};
+
+//timing information for trials
+var fix_time = 500;
+var prime_time = 225;
+var mask_time = 25;
+var soa = prime_time+mask_time;
+var iti_time = 2000;
+var target_maxtime = 3000;
+var feedback_time = 1000;
+var SubNum = Date.now();
+var newblocktrial = [24,40,56,72,88,104,120];
+var noresp = 0;
+var key_codes = [74,75];
+var correct = 0;
+var blockperformance = 0;
+var w = 1;
+var correct_trials = 0;
+
+//item list - randomly select from 1 of 8 lists
+//["ad_rp50_list1", "ad_rp50_list2", "ad_rp50_list3", "ad_rp50_list4", "cd_rp50_list1", "cd_rp50_list2", "cd_rp50_list3", "cd_rp50_list4"];
+var item_Lists = ["ad_rp50_list1", "ad_rp50_list2", "ad_rp50_list3", "ad_rp50_list4", "cd_rp50_list1", "cd_rp50_list2", "cd_rp50_list3", "cd_rp50_list4"];
+var list = jsPsych.randomization.sampleWithoutReplacement(item_Lists, 1);
+var cond = list[0].split("_")[0];
+var rp = list[0].split("_")[1];
+var listnum = list[0].split("_")[2];
+var stimuli = [];
+
+//load the selected list
+function load_list() {
+  Papa.parse("Stimuli/Item_Lists/" +list+ ".csv", {
+    download: true,
+    header: true,
+    complete: function(results) {
+      //console.log(results["data"].length);
+      stimuli = results["data"];
+      load_trials();
+    }
+  });
+}
+
+//Loading information for each trial (randomization of blocks and trials)
+var t = 0;
+var p = ["PRACTICE"]
+var cat = ["TEST","VEHICLE", "MAMMAL", "WEAPON", "VEGETABLE", "CLOTHING", "BIRD", "TOOL", "FRUIT"]
+//var cat = ["TEST","VEHICLE"]
+var cat = jsPsych.randomization.repeat(cat, 1); //randomize order of blocks
+var cat = p.concat(cat); //make sure practice trials come first
+
+var all_trials = [];
+var group_c = [];
+
+function load_trials() {
+  //for each category
+  for (c = 0; c < cat.length; c++){
+    category = cat[c];
+    group_c = [];
+
+    //get all the trials of that category
+    for (i = 0; i < stimuli.length; i++) {
+      if (category == stimuli[i]["Block_Name"]) {
+        trial_info = [stimuli[i]["Prime"], stimuli[i]["Target"], stimuli[i]["Corr_response"], stimuli[i]["Related"], stimuli[i]["Block_Name"], stimuli[i]["Target_cat"]];
+        group_c.push(trial_info);
+      }
+    }
+
+    //randommize trial list for the category and add to list
+    group_c = jsPsych.randomization.repeat(group_c, 1);
+    all_trials = all_trials.concat(group_c);
+  }
+
+}
+
+
+
+//create data matrix to be saved to txt file
+var data_all = {
+  SubNum: [],
+  Task: [],
+  List: [],
+  RP: [],
+  SOA: [],
+  ListNum: [],
+  Trial: [],
+  Block: [],
+  Prime: [],
+  Target: [],
+  Corr_response: [],
+  Related: [],
+  Block_Name: [],
+  Target_cat: [],
+  RT: [],
+  Resp: []
+};
+
+// setup ends here
+
+//plug-in that will call the functions needed to get the stimuli ready
+var get_stimuli = {
+  type: 'call-function',
+  func: load_list
+}
+
+//instructions
+var instructions1 = {
+  type: "instructions",
+  pages: [
+  "Hello. Welcome to our experiment.",
+
+  "<p>In this experiment, you will see a series of experimental trials.</p>" +
+  "<p>At the beginning of each trial, you will see a '+' symbol telling you to pay attention, because the trial is about to begin.</p>" +
+  "<p>Each trial will consist of the following sequence, which you will see on the screen:" +
+  "<p>(1) The '+' symbol</p>" +
+  "<p>(2) A word, which will disappear very quickly</p>" +
+  "<p>(3) A second word</p>" +
+  "<p>Your task will be to make a decision (which we will describe on the next page) about the second word in each sequence.</p>",
+  ],
+  show_clickable_nav : true,
+};
+
+//this set of instructions changes depending on the task
+var instructions2 = {
+  type: "instructions",
+  pages: [],
+  on_start: function(trial) {
+    if (cond == 'ad') {
+      trial.pages = ["<p>The decision you need to make is:</p>"+
+      "<p>is the second word a real, physical, object (like a dog or a shoe or a cloud) " +
+      "or is it an abstract idea or concept (like truth or love or beauty)?</p>" +
+      "<p>Some words (like the examples) are pretty easy to decide. Others are not as easy.</p>" +
+      "<p>You will just need to make the best choice you can, as quickly as you can.</p>",
+
+      "<p>You will make your decision by pressing the J and K keys on the keyboard. If you think the second word is a real, physical object, press the J key as quickly as you can. If you think it is an abstract concept, press the K key as quickly as you can.</p>" +
+      "<p>In order to make these decisions quickly and accurately, please place your dominant hand on the J and K keys, resting your fingers on them so you can quickly respond</p>" +
+      "<p>There will be a few practice trials so you that can get the hang of the experiment.</p>",
+
+      "When you are ready to start the practice trials, make sure your dominant hand is in position, and click next.",
+
+      "REMEMBER: J means real, concrete object, K means abstract concept. You are making the decision about the SECOND word; do not press a key until the SECOND word appears."];
+    }
+    else {
+      trial.pages = ["On each trial, you will be deciding if the second word (and only the second word) is a member of a particular category. " +
+      "For example, you might be asked to decide if the word is a type of flower." +
+      "Throughout the experiment, the category you are being asked about will change from time to time.",
+
+      "You will make your decision by pressing the J and K keys on the keyboard." +
+      "If you think the second word is a member of the category you are being asked about, press J. If you think it is not a member of the category, press K." +
+      "For example, if the second word was 'tulip' you should press J." +
+      "If 'spoon' you should press K." +
+      "<p>In order to make these decisions quickly and accurately, please place your dominant hand on the J and K keys, resting your fingers on them so you can quickly respond.</p>" +
+      "<p>The next slide will inform you what category you will be using to make your decision. There will be a few practice trials so you that can get the hang of the experiment.</p>",
+
+      "REMEMBER: J means 'yes, it is in the category' and K means 'no, it is not in the category'." +
+      "<p>Also remember, you are only making your decision about the second word. Do not press a button until the second word appears.</p>",
+
+      "In the following practice trials, you will be deciding if the second word is a flower." +
+      "<p>Press J if the second word is a flower.</p>"+
+      "<p>Press K if the second word is not a flower.</p>"]
+    }
+  },
+  show_clickable_nav : true
+};
+
+//Trial plug-ins
+
+
+//Present fixation cross
+var fix_trial = {
+  type: 'html-keyboard-response3',
+  stimulus: '+',
+  stimulus_duration: fix_time,
+  trial_duration: fix_time,
+  response_ends_trial: false,
+}
+
+
+//Present prime word
+var prime_trial = {
+  type: 'html-keyboard-response3',
+  stimulus: 'word',
+  stimulus_duration: prime_time,
+  trial_duration: prime_time,
+  response_ends_trial: false,
+  on_start: function(trial) {
+    trial.stimulus = all_trials[t][0];
+  },
+  on_finish: function(data) {},
+}
+
+//Present the mask
+var mask = {
+  type: 'html-keyboard-response3',
+  stimulus: '&&&&&&&&&&',
+  stimulus_duration: mask_time,
+  trial_duration: mask_time,
+  response_ends_trial: false
+}
+
+//Present target word (wait for response_ends_trial)
+var target_trial = {
+  type: 'html-keyboard-response',
+  stimulus: 'target',
+  choices: key_codes,
+  stimulus_duration: target_maxtime,
+  trial_duration: target_maxtime,
+  response_ends_trial: true,
+  on_start: function(trial) {
+    trial.stimulus = all_trials[t][1];
+    resp = 0;
+  },
+  on_finish: function(data) {
+    //save trial data
+    data_all.SubNum.push(SubNum);
+    data_all.List.push(list);
+    data_all.Task.push(cond);
+    data_all.RP.push(rp);
+    data_all.ListNum.push(listnum);
+    data_all.SOA.push(prime_time + mask_time);
+    data_all.Trial.push(t);
+    data_all.Block.push(Math.ceil((t-7)/16));
+    data_all.Prime.push(all_trials[t][0]);
+    data_all.Target.push(all_trials[t][1]);
+    data_all.Corr_response.push(all_trials[t][2]);
+    data_all.Related.push(all_trials[t][3]);
+    data_all.Block_Name.push(all_trials[t][4]);
+    data_all.Target_cat.push(all_trials[t][5]);
+    data_all.RT.push(data.rt);
+    data_all.Resp.push(data.key_press);
+
+    if (all_trials[t][2] == 1 && data.key_press == 74) {
+      correct = 1;
+    }
+    else if (all_trials[t][2] == 2 && data.key_press == 75) {
+      correct = 1;
+    }
+    else {correct = 0}
+
+    correct_trials = correct_trials + correct;
+    console.log(correct_trials);
+
+    if(key_codes.includes(data.key_press)) {
+      resp = 1;
+    }
+
+    //console.log(t);
+
+    t = t + 1;
+  },
+}
+
+//warning to respond faster
+var warning = {
+  type: 'html-keyboard-response',
+  stimulus: 'Please respond quickly. Press the spacebar to continue',
+  stimulus_duration: null,
+  trial_duration: null,
+  response_ends_trial: true,
+  choices: [32]
+}
+
+//only executes if no response was given when target was presented
+var if_no_response = {
+  timeline: [warning],
+  conditional_function: function(){
+      if(resp == 1){
+          return false;
+      } else {
+          return true;
+      }
+  }
+}
+
+//present feedback for practice trials
+var feedback = {
+    type: 'html-keyboard-response3',
+    stimulus: ' ',
+    stimulus_duration: feedback_time,
+    trial_duration: feedback_time,
+    response_ends_trial: false,
+    on_start: function(trial) {
+      if (correct == 1) {
+        trial.stimulus = "Correct!"
+      }
+      else {trial.stimulus = "Wrong!"}
+    }
+}
+
+var if_feedback = {
+  timeline: [feedback],
+  conditional_function: function(){
+      if(t<=4){
+          return true;
+      } else {
+          return false;
+      }
+  }
+}
+
+//ITI blank screen
+var iti_trial = {
+  type: 'html-keyboard-response3',
+  stimulus: '',
+  stimulus_duration: iti_time,
+  trial_duration: iti_time,
+  response_ends_trial: false
+}
+
+//Instructions for each block
+var prac_mid = {
+  type: 'instructions',
+  pages: ["Good Job! You will now do some trials without feedback.",
+
+  "When you are ready, put your fingers on the J and K keys, and press the next button to begin."
+  ],
+  show_clickable_nav : true,
+}
+
+var prac_end = {
+  type: 'instructions',
+  pages: ["Good Job! There will be 128 test trials. The entire experiment usually takes less than 10 minutes. We will be keeping track of how many you get correct, and also how quickly you can make the response; so please make your responses as quickly and as accurately as possible.",
+
+  "When you are ready, put your fingers on the J and K keys, and press the next button to begin."
+  ],
+  show_clickable_nav : true,
+  on_start: function(trial){
+    correct_trials = 0;
+  }
+}
+
+var block_end = {
+  type: 'instructions',
+  pages: ['ins'],
+  show_clickable_nav : true,
+  on_start: function(trial) {
+    //calclate performance
+    blockperformance = correct_trials / 16;
+    console.log(blockperformance);
+
+    if (blockperformance <= .7 && w == 1) {
+      trial.pages = ['Your performance for that block low. (warning message) When you are ready to start the next block, press the next button.'];
+      w = 0;
+    }
+    else if (blockperformance <= .7 && w == 0) {
+      trial.pages = ['Your performance for that block low. (kicked out of experiment message).'];
+      trial.show_clickable_nav = false;
+    }
+    else {
+      trial.pages = ['Good Job! When you are ready to start the next block, press the next button.'];
+    }
+    correct_trials = 0;
+
+  }
+}
+
+var nextcat = "";
+var block_start = {
+  type: 'instructions',
+  pages: ['ins'],
+  show_clickable_nav : true,
+  on_start: function(trial) {
+    if (nextcat == "TEST") {
+      trial.pages = ["You will now complete the next portion of the experiment. It will consist of 16 trials. When you are ready, press the next button to begin."]
+    }
+    else if (nextcat == "BIRD") {
+      trial.pages = ["In the following trials, you will be deciding if the second word is a bird. Press J if the second word is a bird. Press K if the second word is not a bird. Press the next button when you are ready to begin."]
+    }
+    else if (nextcat == "CLOTHING") {
+      trial.pages = ["In the following trials, you will be deciding if the second word is a type of clothing. Press J if the second word is a type of clothing. Press K if the second word is not a type of clothing. Press the next button when you are ready to begin."];
+    }
+    else if (nextcat == "FRUIT") {
+      trial.pages = ["In the following trials, you will be deciding if the second word is a fruit. Press J if the second word is a fruit. Press K if the second word is not a fruit. Press the next button when you are ready to begin."];
+    }
+    else if (nextcat == "MAMMAL") {
+      trial.pages = ["In the following trials, you will be deciding if the second word is a mammal. Press J if the second word is a mammal. Press K if the second word is not a mammal. Press the next button when you are ready to begin."];
+    }
+    else if (nextcat == "TOOL") {
+      trial.pages = ["In the following trials, you will be deciding if the second word is a tool. Press J if the second word is a tool. Press K if the second word is not a tool. Press the next button when you are ready to begin."];
+    }
+    else if (nextcat == "VEGETABLE") {
+      trial.pages = ["In the following trials, you will be deciding if the second word is a vegetable. Press J if the second word is a vegetable. Press K if the second word is not a vegetable. Press the next button when you are ready to begin."];
+    }
+    else if (nextcat == "VEHICLE") {
+      trial.pages = ["In the following trials, you will be deciding if the second word is a vehicle. Press J if the second word is a vehicle. Press K if the second word is not a vehicle. Press the next button when you are ready to begin."];
+    }
+    else if (nextcat == "WEAPON") {
+      trial.pages = ["In the following trials, you will be deciding if the second word is a weapon. Press J if the second word is a weapon. Press K if the second word is not a weapon. Press the next button when you are ready to begin."];
+    }
+  }
+}
+
+//instructions after practice trials
+var block_instructions_half = {
+  timeline: [prac_mid],
+  conditional_function: function(){
+    if(t == 4){
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+var block_instructions_p = {
+  timeline: [prac_end, block_start],
+  conditional_function: function(){
+    if(t == 8){
+      nextcat = all_trials[t+1][4];
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+//instructions for each block
+var block_instructions = {
+  timeline: [block_end, block_start],
+  conditional_function: function(){
+    if(newblocktrial.includes(t)){
+      nextcat = all_trials[t+1][4];
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+//loop through example all_trials
+var loop_trials_p = {
+  timeline: [fix_trial, prime_trial, mask, target_trial, if_feedback, if_no_response, block_instructions_half, block_instructions_p],
+  loop_function: function(data){
+    if(t<=8){
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+//looping through all the trials
+var loop_trials = {
+  timeline: [fix_trial, prime_trial, mask, target_trial, if_no_response, iti_trial, block_instructions],
+  loop_function: function(data){
+    if(t<all_trials.length){
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+function savethedata() {
+  //save cleaned data
+  var datafilename = String(cond)+"_"+String(soa)+"_"+String(rp)+"_"+String(listnum)+"_"+"subj"+String(SubNum);
+  saveData(datafilename, prepdata(data_all));
+}
+
+var save_data = {
+  type: 'call-function',
+  func: savethedata
+}
+
+function gotosurvey () {
+  language_survey_link = "https://illinoislas.qualtrics.com/jfe/form/SV_4OXfENlag982j1r"+"?SubNum="+String(SubNum);
+  window.location = language_survey_link;
+}
+
+// declare the block.
+var language_survey = {
+  type:'call-function',
+  func: gotosurvey
+};
+
+var fullscreen = {
+  type: 'fullscreen',
+  fullscreen_mode: true
+}
+
+var timeline = [consent_form, get_stimuli, fullscreen, instructions1, instructions2, loop_trials_p, loop_trials, language_survey];
+
+
+
+//End of experiment save data
+
+//prep cleaned data to export as csv
+function prepdata(data) {
+  var datacsv = "";
+  var labels = Object.keys(data); //grabs all the properties of data
+
+  for (n = 0; n < labels.length; n++){
+    datacsv = datacsv + labels[n] + ',';
+  }
+  datacsv = datacsv + '\n';
+
+  let ntoloop = data[Object.keys(data)[0]].length;
+  for (n = 0; n < ntoloop; n++){
+    for (var i in data){
+      if (data.hasOwnProperty(i)){
+        datacsv = datacsv + data[i][n] + ','; //in "str" + num, num is converted to a string.
+      }
+    }
+    datacsv = datacsv + '\n';
+  }
+
+  return datacsv;
+}
+
+//save data to server folder
+function saveData(name, data){
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'prime_writedata.php'); // 'write_data.php' is the path to the php file
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(JSON.stringify({filename: name, filedata: data}));
+}
+
+
+jsPsych.init({
+
+  timeline: timeline,
+
+  //exclude those who dont have min width/height
+  exclusions: {
+    min_width: 1000,
+    min_height: 600
+  },
+
+  //save data here
+  on_finish: function(data){
+
+    jsPsych.data.addProperties({
+      subject: SubNum,
+      condition: cond
+    });
+
+    //save raw data
+    savethedata()
+    saveData("prime_rawdata_subj"+String(SubNum), jsPsych.data.get().addToAll({SubNum: SubNum, Condition: cond}).csv());
+  }
+
+});
+
+
+</script>
+</html>
