@@ -412,7 +412,7 @@ var block_end = {
     console.log(blockperformance);
 
     if (blockperformance <= .7 && w == 1) {
-      trial.pages = ['Your performance for this block was unsatisfactory. If you cannot increase you accuracy, we will terminate the experiment. When you are ready to start the next block, press the next button.'];
+      trial.pages = ['Your performance for this block was unsatisfactory. If you cannot increase your accuracy, we will terminate the experiment. When you are ready to start the next block, press the next button.'];
       w = 0;
     }
     else if (blockperformance <= .7 && w == 0) {
@@ -438,28 +438,28 @@ var block_start = {
       "<p>Remember: J means yes, the second word is a real, physical object. K means no, the second word is NOT a real, physical object.</p>"]
     }
     else if (nextcat == "BIRD") {
-      trial.pages = ["In the following trials, you will be deciding if the second word is a bird. Press J if the second word is a bird. Press K if the second word is not a bird. Press the next button when you are ready to begin."]
+      trial.pages = ["In the following trials, you will be deciding if the second word is a BIRD. Press J if the second word is a BIRD. Press K if the second word is not a BIRD. Press the next button when you are ready to begin."]
     }
     else if (nextcat == "CLOTHING") {
-      trial.pages = ["In the following trials, you will be deciding if the second word is a type of clothing. Press J if the second word is a type of clothing. Press K if the second word is not a type of clothing. Press the next button when you are ready to begin."];
+      trial.pages = ["In the following trials, you will be deciding if the second word is a type of CLOTHING. Press J if the second word is a type of CLOTHING. Press K if the second word is not a type of CLOTHING. Press the next button when you are ready to begin."];
     }
     else if (nextcat == "FRUIT") {
-      trial.pages = ["In the following trials, you will be deciding if the second word is a fruit. Press J if the second word is a fruit. Press K if the second word is not a fruit. Press the next button when you are ready to begin."];
+      trial.pages = ["In the following trials, you will be deciding if the second word is a FRUIT. Press J if the second word is a FRUIT. Press K if the second word is not a FRUIT. Press the next button when you are ready to begin."];
     }
     else if (nextcat == "MAMMAL") {
-      trial.pages = ["In the following trials, you will be deciding if the second word is a mammal. Press J if the second word is a mammal. Press K if the second word is not a mammal. Press the next button when you are ready to begin."];
+      trial.pages = ["In the following trials, you will be deciding if the second word is a MAMMAL. Press J if the second word is a MAMMAL. Press K if the second word is not a MAMMAL. Press the next button when you are ready to begin."];
     }
     else if (nextcat == "TOOL") {
-      trial.pages = ["In the following trials, you will be deciding if the second word is a tool. Press J if the second word is a tool. Press K if the second word is not a tool. Press the next button when you are ready to begin."];
+      trial.pages = ["In the following trials, you will be deciding if the second word is a TOOL. Press J if the second word is a TOOL. Press K if the second word is not a TOOL. Press the next button when you are ready to begin."];
     }
     else if (nextcat == "VEGETABLE") {
-      trial.pages = ["In the following trials, you will be deciding if the second word is a vegetable. Press J if the second word is a vegetable. Press K if the second word is not a vegetable. Press the next button when you are ready to begin."];
+      trial.pages = ["In the following trials, you will be deciding if the second word is a VEGETABLE. Press J if the second word is a VEGETABLE. Press K if the second word is not a VEGETABLE. Press the next button when you are ready to begin."];
     }
     else if (nextcat == "VEHICLE") {
-      trial.pages = ["In the following trials, you will be deciding if the second word is a vehicle. Press J if the second word is a vehicle. Press K if the second word is not a vehicle. Press the next button when you are ready to begin."];
+      trial.pages = ["In the following trials, you will be deciding if the second word is a VEHICLE. Press J if the second word is a VEHICLE. Press K if the second word is not a VEHICLE. Press the next button when you are ready to begin."];
     }
     else if (nextcat == "WEAPON") {
-      trial.pages = ["In the following trials, you will be deciding if the second word is a weapon. Press J if the second word is a weapon. Press K if the second word is not a weapon. Press the next button when you are ready to begin."];
+      trial.pages = ["In the following trials, you will be deciding if the second word is a WEAPON. Press J if the second word is a WEAPON. Press K if the second word is not a WEAPON. Press the next button when you are ready to begin."];
     }
   }
 }
@@ -566,18 +566,8 @@ var language_survey = {
   func: gotosurvey,
 };
 
-
-
-//
-// var fullscreen_warning = {
-//   type: "fullscreen",
-//   message: "In order to continue with the experiment, your browser needs to be in fullscreen mode. Press the button to enable fullscreen mode and continue.",
-//   fullscreen_mode: true,
-// }
-
 // var timeline = [consent_form, get_stimuli, fullscreen, instructions1, instructions2, loop_trials_p, loop_trials, language_survey];
 var timeline = [get_stimuli, loop_trials_p]
-
 
 //End of experiment save data
 
