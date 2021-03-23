@@ -1,2 +1,2 @@
 # SuperprimeOnlineExperiment
-A priming experiment written in Javascript by Trisha Patel
+Runs a semantic priming experiment with jsPsych. 
