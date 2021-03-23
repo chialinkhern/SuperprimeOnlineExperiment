@@ -6,8 +6,9 @@ function load_csvs(){
         complete: function(results){
             in_data.config = results["data"][0]
             in_data.task = pick_task(in_data.config["TASK"])
-            in_data.key_codes = in_data.config["KEY"].split(" ").map(function(x){return parseInt(x)})
+            in_data.key_codes = in_data.config["KEY"].split(" ")
             in_data.num_blocks = parseInt(in_data.config["BLOCKS"])
+            in_data.stim_type = in_data.config["STIM_TYPE"]
             Papa.parse("superprime/conditions.csv", {
                 download: true,
                 header: true,
@@ -42,6 +43,7 @@ function load_csvs(){
                                     in_data.test_stimuli = results["data"].filter(x => x.Block_Name!=="PRACTICE")
                                     in_data.practice_stimuli = results["data"].filter(x => x.Block_Name==="PRACTICE")
                                     in_data.num_trials_per_block = in_data.test_stimuli.length/in_data.num_blocks
+                                    console.log(in_data.list) //TODO delete
                                 }
                             })
                         }
@@ -130,7 +132,6 @@ function prep_data(data) { // Trisha's function
             }
         datacsv = datacsv + '\n';
         }
-    console.log(datacsv)
     return datacsv;
     }
 
@@ -139,4 +140,22 @@ function save_data(name, data){
         xhr.open('POST', 'superprime/write_data.php'); // 'write_data.php' is the path to the php file
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send(JSON.stringify({filename: name, filedata: data}));
+}
+
+
+function get_image_names(){
+    let images = []
+    images.push("Stimuli/images/" + "mask" + ".jpg")
+    images.push("Stimuli/images/fixation.jpg")
+    images.push("Stimuli/images/blank.jpg")
+    let all_stimuli = [in_data["practice_stimuli"], in_data["test_stimuli"]]
+    for (let i = 0; i < all_stimuli.length; i++){
+        stimuli = all_stimuli[i]
+        for (let j = 0; j < stimuli.length; j++){
+            let trial = stimuli[j]
+            images.push("Stimuli/images/" + trial["Prime"] + ".jpg")
+            images.push("Stimuli/images/" + trial["Target"] + ".jpg")
+        }
+    }
+    return images
 }

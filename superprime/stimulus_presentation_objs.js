@@ -17,6 +17,7 @@ let in_data = {
 }
 
 let out_data = {
+    StimType: [],
     SubNum: [],
     Task: [],
     List: [],
@@ -113,12 +114,12 @@ let if_not_fullscreen = {
 }
 
 let warning = {
-    type: 'html-keyboard-response3',
+    type: 'html-keyboard-response2',
     stimulus: 'Please respond quickly. Press the spacebar to continue.',
     stimulus_duration: null,
     trial_duration: null,
     response_ends_trial: true,
-    choices: [32]
+    choices: [" "]
 }
 
 let if_no_response = {
@@ -157,7 +158,7 @@ let thresholded_boot = {
 }
 
 let feedback = {
-    type: "html-keyboard-response3",
+    type: "html-keyboard-response2",
     stimulus: "",
     stimulus_duration: 5000, //TODO: take from config/whatever
     trial_duration: 5000, //TODO: same here
@@ -218,13 +219,13 @@ let language_survey = {
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 let present_text = {
-    type: "html-keyboard-response3",
+    type: "html-keyboard-response2",
     stimulus: "",
     stimulus_duration: 40,
     trial_duration: 40,
     correct_response: null,
     response_correct: null,
-    choices: in_data.key_codes,
+    choices: null,
     response_ends_trial: false,
     on_start: function(trial){
         trial.stimulus = present_trial.trial_events[present_trial.event_types[iterate_events.event_num]]
@@ -232,6 +233,7 @@ let present_text = {
         trial.trial_duration = parseInt(in_data.event_params[present_trial.event_types[iterate_events.event_num]])
         if (present_trial.event_types[iterate_events.event_num] === "Target"){
             trial.choices = in_data.key_codes
+            console.log(trial.choices) //TODO remove
             trial.response_ends_trial = true
         }
         else if (present_trial.event_types[iterate_events.event_num]==="ITI"){
@@ -246,29 +248,31 @@ let present_text = {
     },
     on_finish: function(data){
         if (present_trial.event_types[iterate_events.event_num] === "Target"){
+            // logs if response was collected and transforms resp if yes
+            if (data.response !== null){
+                if (in_data.key_codes.includes(data.response.toLowerCase())){
+                    present_trial.response_logged = true
+                }
 
-            // logs if response was collected
-            if (in_data.key_codes.includes(data.key_press)){
-                present_trial.response_logged = true
+            // converts J|K keypresses into 1|2
+                if (data.response.toLowerCase()===in_data.key_codes[0].toLowerCase()){
+                    data.response = 1
+                }
+                else if (data.response.toLowerCase()===in_data.key_codes[1].toLowerCase()){
+                    data.response = 2
+                }
             }
             else {present_trial.response_logged = false}
 
-            // converts J|K keypresses into 1|2
-            if (data.key_press===74){ //TODO: this makes the inflexible-- you can't assign any keycodes you want without changing the code anymore
-                data.key_press = 1
-            }
-            else if (data.key_press===75){
-                data.key_press = 2
-            }
-
             // logs if response was correct and keeps running log of percentage correct in present_block
-            if (data.key_press === present_text.correct_response){
+            if (data.response === present_text.correct_response){
                 present_text.response_correct = true
                 iterate_trials.num_correct = iterate_trials.num_correct + 1
             }
             else {present_text.response_correct = false}
 
             // pushes participant data to JSON for saving
+            out_data.StimType.push(in_data.stim_type)
             out_data.SubNum.push(in_data.SubNum)
             out_data.List.push(in_data.list)
             out_data.Task.push(in_data.task)
@@ -284,7 +288,7 @@ let present_text = {
             out_data.Block_Name.push(present_trial.trial_events.Block_Name)
             out_data.Target_cat.push(present_trial.trial_events.Target_cat)
             out_data.RT.push(data.rt)
-            out_data.Resp.push(data.key_press)
+            out_data.Resp.push(data.response)
 
             iterate_trials.percentage_correct = iterate_trials.num_correct/(iterate_trials.trial_num+1)
             console.log(iterate_trials.percentage_correct)
@@ -292,8 +296,130 @@ let present_text = {
     }
 }
 
+
+let present_image = {
+    type:"image-keyboard-response2",
+    stimulus: "Stimuli/images/blank.jpg",
+    stimulus_duration: 40,
+    trial_duration: 40,
+    response_ends_trial: false,
+    render_on_canvas: true,
+    on_start: function(trial){
+        trial.stimulus_duration = parseInt(in_data.event_params[present_trial.event_types[iterate_events.event_num]])
+        trial.trial_duration = parseInt(in_data.event_params[present_trial.event_types[iterate_events.event_num]])
+
+        if (present_trial.event_types[iterate_events.event_num] === "Target" |
+            present_trial.event_types[iterate_events.event_num] === "Prime"){
+            let img_name = present_trial.trial_events[present_trial.event_types[iterate_events.event_num]]
+            trial.stimulus = "Stimuli/images/" + img_name + ".jpg"
+            if (present_trial.event_types[iterate_events.event_num] === "Target"){
+                trial.choices = in_data.key_codes
+                trial.response_ends_trial = true
+            }
+        }
+        else if (present_trial.event_types[iterate_events.event_num] === "Mask"){
+            trial.stimulus = "Stimuli/images/mask.jpg"
+        }
+        else if (present_trial.event_types[iterate_events.event_num] === "Fixation"){
+            trial.stimulus = "Stimuli/images/fixation.jpg"
+        }
+        else if (present_trial.event_types[iterate_events.event_num]==="ITI"){
+            trial.choices = []
+            trial.response_ends_trial = false
+            trial.stimulus = null
+        }
+    },
+    on_finish: function(data) {
+        if (present_trial.event_types[iterate_events.event_num] === "Target") {
+
+            // logs if response was collected and transforms resp if yes
+            if (data.response !== null){
+                if (in_data.key_codes.includes(data.response.toLowerCase())){
+                    present_trial.response_logged = true
+                }
+
+            // converts J|K keypresses into 1|2
+                if (data.response.toLowerCase()===in_data.key_codes[0].toLowerCase()){
+                    data.response = 1
+                }
+                else if (data.response.toLowerCase()===in_data.key_codes[1].toLowerCase()){
+                    data.response = 2
+                }
+            }
+            else {present_trial.response_logged = false}
+
+
+            // logs if response was correct and keeps running log of percentage correct in present_block
+            if (data.response === present_text.correct_response) {
+                present_text.response_correct = true
+                iterate_trials.num_correct = iterate_trials.num_correct + 1
+            } else {
+                present_text.response_correct = false
+            }
+
+            // pushes participant data to JSON for saving
+            out_data.StimType.push(in_data.stim_type)
+            out_data.SubNum.push(in_data.SubNum)
+            out_data.List.push(in_data.list)
+            out_data.Task.push(in_data.task)
+            out_data.RP.push(in_data.rp)
+            out_data.ListNum.push(in_data.list_num)
+            out_data.SOA.push(in_data.soa)
+            out_data.Trial.push(present_superprime.trial_num) //TODO: write in present_superprime.trial_num
+            out_data.Block.push(present_superprime.block_num) //TODO: write in attribute
+            out_data.Prime.push(present_trial.trial_events.Prime)
+            out_data.Target.push(present_trial.trial_events.Target)
+            out_data.Corr_response.push(present_trial.trial_events.Corr_response)
+            out_data.Related.push(present_trial.trial_events.Related)
+            out_data.Block_Name.push(present_trial.trial_events.Block_Name)
+            out_data.Target_cat.push(present_trial.trial_events.Target_cat)
+            out_data.RT.push(data.rt)
+            out_data.Resp.push(data.response)
+
+            iterate_trials.percentage_correct = iterate_trials.num_correct / (iterate_trials.trial_num + 1)
+            console.log(iterate_trials.percentage_correct)
+        }
+    }
+}
+
+
+let preload_images = {
+    type: "preload",
+    images: function(){return get_image_names()},
+    show_preload_progress_bar: true,
+    message: " Loading images. Please wait...",
+    error_message: "Please contact researcher. The following images failed to load: ",
+    continue_after_error: true,
+    show_detailed_errors: true,
+    max_load_time: 60000, // 1 minute
+}
+
+let if_preload = {
+    timeline: [preload_images],
+    conditional_function: function(){
+        if (in_data.stim_type === "PP"){return true}
+        else {return false}
+    }
+}
+
+let if_text = {
+    timeline: [present_text],
+    conditional_function: function(){
+        if (in_data.stim_type === "WW"){return true}
+        else {return false}
+    }
+}
+
+let if_image = {
+    timeline: [present_image],
+    conditional_function: function(){
+        if (in_data.stim_type === "PP"){return true}
+        else {return false}
+    }
+}
+
 let iterate_events = {
-  timeline: [present_text],
+  timeline: [if_text, if_image],
   event_num: 0,
   loop_function: function(){
       iterate_events.event_num = iterate_events.event_num + 1

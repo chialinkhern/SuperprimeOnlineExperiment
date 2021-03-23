@@ -9,12 +9,12 @@
  **/
 
 
-jsPsych.plugins["html-keyboard-response"] = (function() {
+jsPsych.plugins["html-keyboard-response3"] = (function() {
 
   var plugin = {};
 
   plugin.info = {
-    name: 'html-keyboard-response',
+    name: 'html-keyboard-response3',
     description: '',
     parameters: {
       stimulus: {
@@ -138,9 +138,11 @@ jsPsych.plugins["html-keyboard-response"] = (function() {
 
     // end trial if trial_duration is set
     if (trial.trial_duration !== null) {
-      jsPsych.pluginAPI.setTimeout(function() {
-        end_trial();
-      }, trial.trial_duration);
+      function startonfps(){
+        jsPsych.pluginAPI.setTimeout(function() {
+          end_trial();
+        }, trial.trial_duration)}
+      requestAnimationFrame(startonfps);
     }
 
   };
