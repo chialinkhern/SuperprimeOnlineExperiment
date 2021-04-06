@@ -101,7 +101,7 @@ Item,Fixation,Prime,Mask,Target,Corr_response,Related,Block_Name,Target_cat
 100,+,deer,&&&&&&&&&&&&,moose,2,1,BIRD,MAMMAL
 101,+,robin,&&&&&&&&&&&&,tie,2,0,BIRD,CLOTHING
 102,+,chickadee,&&&&&&&&&&&&,parsnip,2,0,BIRD,VEGETABLE
-103,+,dove,&&&&&&&&&&&&,flamethrower,2,0,BIRD,WEAPON
+103,+,dove ,&&&&&&&&&&&&,flamethrower,2,0,BIRD,WEAPON
 104,+,owl,&&&&&&&&&&&&,dolphin,2,0,BIRD,MAMMAL
 105,+,shovel,&&&&&&&&&&&&,spade,1,1,TOOL,TOOL
 106,+,pliers,&&&&&&&&&&&&,wrench,1,1,TOOL,TOOL

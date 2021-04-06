@@ -21,7 +21,7 @@ Item,Fixation,Prime,Mask,Target,Corr_response,Related,Block_Name,Target_cat
 20,+,jet,&&&&&&&&&&&&,pajamas,2,0,VEHICLE,CLOTHING
 21,+,grapes,&&&&&&&&&&&&,raisin,2,1,VEHICLE,FRUIT
 22,+,sandpaper,&&&&&&&&&&&&,saw,2,1,VEHICLE,TOOL
-23,+,dove,&&&&&&&&&&&&,pigeon,2,1,VEHICLE,BIRD
+23,+,dove ,&&&&&&&&&&&&,pigeon,2,1,VEHICLE,BIRD
 24,+,robe,&&&&&&&&&&&&,dress,2,1,VEHICLE,CLOTHING
 25,+,truck,&&&&&&&&&&&&,giraffe,1,0,MAMMAL,MAMMAL
 26,+,lime,&&&&&&&&&&&&,dog,1,0,MAMMAL,MAMMAL

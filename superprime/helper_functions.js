@@ -144,8 +144,12 @@ function save_data(name, data){
 
 
 function get_image_names(){
-    let images = []
-    images.push("Stimuli/images/" + "mask" + ".jpg")
+    let images = ["Stimuli/images/mask_ant.jpg", "Stimuli/images/mask_carp.jpg", "Stimuli/images/mask_daffodil.jpg",
+    "Stimuli/images/mask_firestation.jpg", "Stimuli/images/mask_goldfish.jpg", "Stimuli/images/mask_guitar.jpg",
+    "Stimuli/images/mask_house.jpg", "Stimuli/images/mask_legos.jpg", "Stimuli/images/mask_maple.jpg",
+    "Stimuli/images/mask_mixer.jpg", "Stimuli/images/mask_oak.jpg", "Stimuli/images/mask_piano.jpg",
+    "Stimuli/images/mask_pot.jpg", "Stimuli/images/mask_prayingmantis.jpg", "Stimuli/images/mask_sunflower.jpg",
+     "Stimuli/images/mask_teddybear.jpg"]
     images.push("Stimuli/images/fixation.jpg")
     images.push("Stimuli/images/blank.jpg")
     let all_stimuli = [in_data["practice_stimuli"], in_data["test_stimuli"]]

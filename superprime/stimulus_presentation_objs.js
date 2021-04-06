@@ -167,29 +167,29 @@ let feedback = {
         if (in_data.task==="ad"){ //TODO: yo this needs to be tested
             if (present_text.correct_response===1){
                 if (present_text.response_correct){
-                    trial.stimulus = "Correct! The second word is a real, physical, object."
+                    trial.stimulus = `Correct! The second ${general_instructions.stim} is a real, physical, object.`
                 }
-                else {trial.stimulus = "Wrong! The second word IS a real, physical, object."}
+                else {trial.stimulus = `Wrong! The second ${general_instructions.stim} IS a real, physical, object.`}
             }
             else if (present_text.correct_response===2){
                 if (present_text.response_correct){
-                    trial.stimulus = "Correct! The second word is NOT a real, physical, object."
+                    trial.stimulus = `Correct! The second ${general_instructions.stim} is NOT a real, physical, object.`
                 }
-                else {trial.stimulus = "Wrong! The second word is NOT a real, physical, object."}
+                else {trial.stimulus = `Wrong! The second ${general_instructions.stim} is NOT a real, physical, object.`}
             }
         }
-        else if (in_data.task==="cd"){
+        else if (in_data.task===`cd`){
             if (present_text.correct_response===1){
                 if (present_text.response_correct){
-                    trial.stimulus = "Correct! The second word is part of the category."
+                    trial.stimulus = `Correct! The second ${general_instructions.stim} is part of the category.`
                 }
-                else {trial.stimulus = "Wrong! The second word IS part of the category."}
+                else {trial.stimulus = `Wrong! The second ${general_instructions.stim} IS part of the category.`}
             }
             else if (present_text.correct_response===2){
                 if (present_text.response_correct){
-                    trial.stimulus = "Correct! The second word is NOT part of the category"
+                    trial.stimulus = `Correct! The second ${general_instructions.stim} is NOT part of the category`
                 }
-                else {trial.stimulus = "Wrong! The second word is NOT part of the category."}
+                else {trial.stimulus = `Wrong! The second ${general_instructions.stim} is NOT part of the category.`}
             }
         }
     }
@@ -318,7 +318,12 @@ let present_image = {
             }
         }
         else if (present_trial.event_types[iterate_events.event_num] === "Mask"){
-            trial.stimulus = "Stimuli/images/mask.jpg"
+            trial.stimulus = shuffle(["Stimuli/images/mask_ant.jpg", "Stimuli/images/mask_carp.jpg", "Stimuli/images/mask_daffodil.jpg",
+    "Stimuli/images/mask_firestation.jpg", "Stimuli/images/mask_goldfish.jpg", "Stimuli/images/mask_guitar.jpg",
+    "Stimuli/images/mask_house.jpg", "Stimuli/images/mask_legos.jpg", "Stimuli/images/mask_maple.jpg",
+    "Stimuli/images/mask_mixer.jpg", "Stimuli/images/mask_oak.jpg", "Stimuli/images/mask_piano.jpg",
+    "Stimuli/images/mask_pot.jpg", "Stimuli/images/mask_prayingmantis.jpg", "Stimuli/images/mask_sunflower.jpg",
+     "Stimuli/images/mask_teddybear.jpg"])[0]
         }
         else if (present_trial.event_types[iterate_events.event_num] === "Fixation"){
             trial.stimulus = "Stimuli/images/fixation.jpg"
