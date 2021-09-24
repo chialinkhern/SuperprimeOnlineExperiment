@@ -1,7 +1,7 @@
 ---
 deployment:
  tasks:
- - export DEPLOYPATH=/home/chialinkhern/public_html/repositories/SuperprimeOnlineExperiment/
+ - export DEPLOYPATH=/home/chialinkhern/public_html/
  - /bin/cp -R superprime $DEPLOYPATH
  - /bin/cp -R jsPsych-6.3.0 $DEPLOYPATH
  - /bin/cp -R Stimuli $DEPLOYPATH
