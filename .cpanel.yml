@@ -7,5 +7,5 @@ deployment:
  - /bin/cp -R Stimuli $DEPLOYPATH
  - /bin/cp -R main.html $DEPLOYPATH
  - /bin/cp -R KaraConsentForm.html $DEPLOYPATH
- - /bin/cp -R test $DEPLOYPATH
+ - cp test $DEPLOYPATH
  - /bin/cp -R README.md $DEPLOYPATH
