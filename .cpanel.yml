@@ -1,5 +1,5 @@
 ---
 deployment:
  tasks:
- - export DEPLOYPATH=/home/chialinkhern/public_html/repositories/
- - /bin/cp SuperprimeOnlineExperiment
+ - export DEPLOYPATH=/home/chialinkhern/public_html/
+ - /bin/cp -R /home/username/gitrepo/testing $DEPLOYPATH
