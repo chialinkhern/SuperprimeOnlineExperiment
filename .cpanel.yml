@@ -1,6 +1,5 @@
 ---
 deployment:
  tasks:
- - export DEPLOYPATH=/home/chialinkhern/public_html/
- - /bin/cp index.html $DEPLOYPATH
- - /bin/cp style.css $DEPLOYPATH
+ - export DEPLOYPATH=/home/chialinkhern/public_html/repositories/
+ - /bin/cp SuperprimeOnlineExperiment
