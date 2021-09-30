@@ -48,8 +48,8 @@ let out_data = {
 
 let consent_form = {
     type:'external-html',
-    // url: "http://lachia2.web.illinois.edu/repositories/SuperprimeOnlineExperiment/KaraConsentForm.html",
-    url: "KaraConsentForm.html",
+    url: "http://lachia2.web.illinois.edu/repositories/SuperprimeOnlineExperiment/KaraConsentForm.html",
+    // url: "KaraConsentForm.html",
     cont_btn: "start",
     check_fn: check_consent
 }
